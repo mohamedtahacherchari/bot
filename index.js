@@ -102,7 +102,10 @@ function generateMathQuestion() {
     answer: a * b,
   };
 }
-
+// Route pour la racine
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur le bot Telegram ! Ce bot est destiné à jouer à un jeu mathématique interactif.');
+});
 // Démarrer le serveur Express
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
