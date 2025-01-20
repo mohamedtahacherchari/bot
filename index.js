@@ -1,28 +1,14 @@
-const express = require('express');
-const bodyParser = require('body-parser');
 const TelegramBot = require('node-telegram-bot-api');
 
-
+// Remplacez par votre token Telegram
 const TOKEN = '7973921579:AAEIOKkfTF8qagBI3TDVRV8LmBI9-YD9_Xc';
-const WEBHOOK_URL = 'https://bot-y0aa.onrender.com/bot';  
 
+// Créez une instance du bot
+console.log("Initialisation du bot...");
+const bot = new TelegramBot(TOKEN, { polling: true });
 
-const bot = new TelegramBot(TOKEN);
-
-// Créez une application Express
-const app = express();
-
-// Utilisez body-parser pour traiter les données JSON
-app.use(bodyParser.json());
-
-// Configurez le webhook
-bot.setWebHook(`${WEBHOOK_URL}/bot`);
-
-// Réception des mises à jour via POST
-app.post('/bot', (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);  // Réponse OK pour Telegram
-});
+// Stockage des scores en mémoire
+const scores = {};
 
 // Commande /start
 bot.onText(/\/start/, (msg) => {
@@ -61,6 +47,7 @@ bot.onText(/\/play/, (msg) => {
   scores[chatId].currentAnswer = questionData.answer;
 });
 
+// Gestion des messages pour les réponses des utilisateurs
 bot.on('message', (msg) => {
   console.log("Message reçu :", msg.text);
   const chatId = msg.chat.id;
@@ -85,6 +72,7 @@ bot.on('message', (msg) => {
   }
 });
 
+// Commande /score
 bot.onText(/\/score/, (msg) => {
   console.log("Commande /score reçue :", msg);
   const chatId = msg.chat.id;
@@ -93,6 +81,7 @@ bot.onText(/\/score/, (msg) => {
   bot.sendMessage(chatId, `Votre score actuel est : ${userScore} points.`);
 });
 
+// Fonction pour générer une question de mathématiques
 function generateMathQuestion() {
   console.log("Génération d'une question de maths...");
   const a = Math.floor(Math.random() * 10) + 1;
@@ -102,12 +91,3 @@ function generateMathQuestion() {
     answer: a * b,
   };
 }
-// Route pour la racine
-app.get('/', (req, res) => {
-  res.send('Bienvenue sur le bot Telegram ! Ce bot est destiné à jouer à un jeu mathématique interactif.');
-});
-// Démarrer le serveur Express
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur bot en écoute sur le port ${PORT}`);
-});
